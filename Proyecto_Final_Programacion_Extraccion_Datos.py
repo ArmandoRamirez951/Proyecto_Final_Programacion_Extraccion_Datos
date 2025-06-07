@@ -10,6 +10,7 @@ Profesor: Josue Miguel Flores Parra
 
 import logging
 import os
+import re
 import sys
 import time
 import pandas as pd
@@ -170,6 +171,7 @@ def extraccion():
     print(df.sample(5))
     df.to_csv("Extraccion de datos/movies.csv")
 
+
 '''
 En esta seccion del codigo lo que se va a hacer es trabajar con el scv movies
 y limpiar los datos para dejar las columnas que necesitamos, con estos datos limpio
@@ -293,3 +295,81 @@ app.layout = html.Div([
     sidebar,
     content
 ])
+
+"""
+En esta seccion del codigo se tomara el dataframe movies ya con su respectiva limpieza y normalizada y
+se migrara como parte del proyecto al programa de MYSQL Workbench, (no si antes hacer conexion) donde el usuario ingresara
+su contraseña de su aplicacion para que se realize la conexion directa sin necesidad de tener abierta
+la aplicacion, en dado caso de que la contreña sea incorrecta, retornara de nuevo a la seccion de ingresar 
+codigo hasta que se ingrese la contraseña correcta
+"""
+def migrar_a_mysql():
+    def convertir_duracion(duracion):
+        """Convierte texto como '2h 22min' en minutos (int)"""
+        try:
+            duracion = duracion.lower()
+            total = 0
+            horas = re.search(r"(\d+)h", duracion)
+            minutos = re.search(r"(\d+)(?:min|m)", duracion)
+            if horas:
+                total += int(horas.group(1)) * 60
+            if minutos:
+                total += int(minutos.group(1))
+            return total
+        except:
+            return None
+
+    # Pedir contraseña hasta que sea válida o se cancele
+    while True:
+        contraseña = simpledialog.askstring("Conexión a MySQL",
+                                            "Favor de ingresar la contraseña de su aplicación MySQL (Workbench)")
+        if contraseña is None:
+            messagebox.showwarning("Cancelado", "Operación cancelada por el usuario.")
+            break
+
+        try:
+            # Verificar conexión con mysql.connector
+            conexion_mysql = mysql.connector.connect(
+                host="localhost",
+                port=3306,
+                user="root",
+                password=contraseña
+            )
+            cursor = conexion_mysql.cursor()
+            cursor.execute("CREATE DATABASE IF NOT EXISTS Extraccion_de_datos_Movies;")
+            cursor.close()
+            conexion_mysql.close()
+            break  # Salir del ciclo si fue exitoso
+        except Error:
+            messagebox.showerror("Error de conexión",
+                                 "❌ Contraseña incorrecta o fallo de conexión. Inténtalo de nuevo.")
+
+    # Si se proporcionó una contraseña válida, continuar
+    if contraseña:
+        # Leer CSV original
+        df = pd.read_csv("Extraccion de datos/movies.csv")
+
+        # Eliminar columna extra si existe
+        if 'Unnamed: 0' in df.columns:
+            df.drop(columns=['Unnamed: 0'], inplace=True)
+
+        # Limpiar columnas
+        df["name_movie"] = df["name_movie"].str.replace(r"Pelicula: \[|\]", "", regex=True)
+        df["year_movie"] = df["year_movie"].str.replace("Año: ", "", regex=False)
+        df["time_movie"] = df["time_movie"].str.replace("Tiempo: ", "", regex=False)
+        df["score_movie"] = df["score_movie"].str.replace("Puntaje: ", "", regex=False)
+
+        df["year_movie"] = pd.to_numeric(df["year_movie"], errors="coerce")
+        df["score_movie"] = pd.to_numeric(df["score_movie"].str.replace(",", "."), errors="coerce")
+        df["time_movie"] = df["time_movie"].apply(convertir_duracion)
+
+        # Eliminar filas con valores nulos
+        df.dropna(inplace=True)
+
+        # Conexión SQLAlchemy
+        try:
+            engine = create_engine(f"mysql+pymysql://root:{contraseña}@localhost:3306/Extraccion_de_datos_Movies")
+            df.to_sql(name='data_movies', con=engine, if_exists='append', index=False)
+            print("✅ Migración completada correctamente.")
+        except OperationalError as e:
+            messagebox.showerror("Error", f"❌ No se pudo migrar a MySQL: {e}")
