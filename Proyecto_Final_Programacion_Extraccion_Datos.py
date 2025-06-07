@@ -662,8 +662,9 @@ def render_page_content(pathname):
     ])
 
 """
-En esta seccion se crea un menu para que cuando lo manden 
-a llamar, este muestre todo el trabajo que estamos realizando
+En esta seccion se inicia el dashboart, para que
+funcione correctamente ya que manda a llamar los archivos
+que emos creado para trabajar correctamente
 """
 def iniciar_dashboard():
     messagebox.showwarning("Regresar al Menu", "Cuando requiera volver al menú presione el botón stop del programa")
