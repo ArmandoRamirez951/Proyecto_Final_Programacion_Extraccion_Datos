@@ -35,70 +35,6 @@ root = Tk()
 root.withdraw()
 import re
 
-# ----------- Aquí van tus funciones originales sin modificar -----------
-
-def extraccion():
-    driver = ChromeDriverManager().install()
-    s = Service(driver)
-    opc = Options()
-    opc.add_argument("--window-size=1020,1200")
-    navegador = webdriver.Chrome(options=opc, service=s)
-    navegador.get("https://www.imdb.com/es-es/")
-    wait = WebDriverWait(navegador, 10)
-    time.sleep(15)
-
-    menu_btn = navegador.find_element(By.CSS_SELECTOR, "label[aria-label='Abrir panel de navegación']")
-    menu_btn.click()
-    time.sleep(5)
-
-    menu_peliculas = navegador.find_element(By.CSS_SELECTOR, "label[aria-label='Desplegar enlaces de navegación de Películas']")
-    menu_peliculas.click()
-    time.sleep(2)
-
-    mejores_250_btn = navegador.find_element(By.LINK_TEXT, "Las 250 películas mejor valoradas")
-    mejores_250_btn.click()
-    time.sleep(5)
-
-    movies_data = {"name_movie": [], "year_movie": [],
-                   "score_movie": [], "time_movie": []}
-
-    soup = BeautifulSoup(navegador.page_source, "html.parser")
-    datos_paginas = soup.find_all("div", attrs={"class": "sc-4b408797-0 eFrxXF cli-children"})
-    if datos_paginas:
-        for item in datos_paginas:
-            nombre = item.find("h3", attrs={"class": "ipc-title__text"})
-            if nombre:
-                movies_data["name_movie"].append(f"Pelicula: [{nombre.text.strip()}]")
-            else:
-                movies_data["name_movie"].append("Nombre de la película no encontrado")
-
-            metadatos = item.find_all("span", attrs={"class": "sc-4b408797-8 iurwGb cli-title-metadata-item"})
-            if len(metadatos) >= 1:
-                movies_data["year_movie"].append(f"Año: {metadatos[0].text.strip()}")
-            else:
-                movies_data["year_movie"].append("Año no encontrado")
-
-            if len(metadatos) >= 2:
-                movies_data["time_movie"].append(f"Tiempo: {metadatos[1].text.strip()}")
-            else:
-                movies_data["time_movie"].append("Tiempo no encontrado")
-
-            puntuacion = item.find("span", attrs={"class": "ipc-rating-star--rating"})
-            if puntuacion:
-                movies_data["score_movie"].append(f"Puntaje: {puntuacion.text.strip()}")
-            else:
-                movies_data["score_movie"].append("No se encontró puntuación")
-    time.sleep(3)
-    navegador.close()
-    print(movies_data)
-    ruta_actual = os.path.dirname(os.path.abspath(__file__))
-    nombre_carpeta = "Extraccion de datos"
-    ruta_carpeta = os.path.join(ruta_actual, nombre_carpeta)
-    os.makedirs(ruta_carpeta, exist_ok=True)
-    print(f"Carpeta creada en: {ruta_carpeta}")
-    df = pd.DataFrame(movies_data)
-    print(df.sample(5))
-    df.to_csv("Extraccion de datos/movies.csv")
 
 # ----------- Aquí van tus funciones originales sin modificar -----------
 """
@@ -242,61 +178,6 @@ def limpieza_de_los_datos():
     print(df.head())
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-df_dashboard = None
-
-SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": 0,
-    "left": 0,
-    "bottom": 0,
-    "width": "16rem",
-    "padding": "2rem 1rem",
-    "background": "linear-gradient(to bottom, #A9DFBF, #58D68D)",
-    "color": "white",
-    "boxShadow": "2px 0 5px rgba(0,0,0,0.1)",
-    "textShadow": "1px 1px 2px rgba(0,0,0,0.3)"
-}
-
-CONTENT_STYLE = {
-    "margin-left": "18rem",
-    "margin-right": "2rem",
-    "padding": "2rem 2rem",
-    "backgroundColor": "white",
-    "borderRadius": "12px",
-    "boxShadow": "0 8px 24px rgba(0,0,0,0.1)",
-    "minHeight": "100vh"
-}
-
-sidebar = html.Div(
-    [
-        html.H2("IMDb Movies", className="display-4", style={"color": "white", "textShadow": "2px 2px 4px rgba(0,0,0,0.5)"}),
-        html.Hr(style={"borderColor": "rgba(255,255,255,0.3)"}),
-        html.P("Proyecto final - Dashboard", className="lead", style={"color": "white", "textShadow": "1px 1px 2px rgba(0,0,0,0.3)"}),
-        dbc.Nav(
-            [
-                dbc.NavLink("Hogar", href="/", active="exact", style={"color": "white"}),
-                dbc.NavLink("Distribución por Puntajes", href="/dash1", active="exact", style={"color": "white"}),
-                dbc.NavLink("Distribución por Duración", href="/dash2", active="exact", style={"color": "white"}),
-                dbc.NavLink("Datos Origen", href="https://www.imdb.com/es-es/", target="_blank", style={"color": "white"}),
-                dbc.NavLink("Trabajo en Github", href="https://github.com/ArmandoRamirez951/Programacion_extraccion_datos", target="_blank", style={"color": "white"})
-            ],
-            vertical=True,
-            pills=True,
-        ),
-    ],
-    style=SIDEBAR_STYLE,
-)
-
-content = html.Div(id="page-content", style=CONTENT_STYLE)
-
-# Aquí va el layout general, antes de iniciar el servidor
-app.layout = html.Div([
-    dcc.Location(id="url"),  # Necesario para navegación entre páginas
-    sidebar,
-    content
-])
-
 """
 En esta seccion del codigo se tomara el dataframe movies ya con su respectiva limpieza y normalizada y
 se migrara como parte del proyecto al programa de MYSQL Workbench, (no si antes hacer conexion) donde el usuario ingresara
@@ -380,6 +261,60 @@ Con esta  seccion empezamos a crear lo que sera la presentacion
 de nuestra pagina, sera la interfaz principal que el usuario podra ver,
 contendra titulo, nombre de materia, colaboradores e incluso el nonmbre y logo del maestro
 """
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+df_dashboard = None
+
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+    "background": "linear-gradient(to bottom, #A9DFBF, #58D68D)",
+    "color": "white",
+    "boxShadow": "2px 0 5px rgba(0,0,0,0.1)",
+    "textShadow": "1px 1px 2px rgba(0,0,0,0.3)"
+}
+
+CONTENT_STYLE = {
+    "margin-left": "18rem",
+    "margin-right": "2rem",
+    "padding": "2rem 2rem",
+    "backgroundColor": "white",
+    "borderRadius": "12px",
+    "boxShadow": "0 8px 24px rgba(0,0,0,0.1)",
+    "minHeight": "100vh"
+}
+
+sidebar = html.Div(
+    [
+        html.H2("IMDb Movies", className="display-4", style={"color": "white", "textShadow": "2px 2px 4px rgba(0,0,0,0.5)"}),
+        html.Hr(style={"borderColor": "rgba(255,255,255,0.3)"}),
+        html.P("Proyecto final - Dashboard", className="lead", style={"color": "white", "textShadow": "1px 1px 2px rgba(0,0,0,0.3)"}),
+        dbc.Nav(
+            [
+                dbc.NavLink("Hogar", href="/", active="exact", style={"color": "white"}),
+                dbc.NavLink("Distribución por Puntajes", href="/dash1", active="exact", style={"color": "white"}),
+                dbc.NavLink("Distribución por Duración", href="/dash2", active="exact", style={"color": "white"}),
+                dbc.NavLink("Datos Origen", href="https://www.imdb.com/es-es/", target="_blank", style={"color": "white"}),
+                dbc.NavLink("Trabajo en Github", href="https://github.com/ArmandoRamirez951/Programacion_extraccion_datos", target="_blank", style={"color": "white"})
+            ],
+            vertical=True,
+            pills=True,
+        ),
+    ],
+    style=SIDEBAR_STYLE,
+)
+
+content = html.Div(id="page-content", style=CONTENT_STYLE)
+
+# Aquí va el layout general, antes de iniciar el servidor
+app.layout = html.Div([
+    dcc.Location(id="url"),  # Necesario para navegación entre páginas
+    sidebar,
+    content
+])
 
 def pagina_hogar():
         return html.Div(
