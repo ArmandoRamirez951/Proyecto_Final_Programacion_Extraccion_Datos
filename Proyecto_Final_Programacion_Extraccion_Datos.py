@@ -410,3 +410,64 @@ def pagina_hogar():
                 "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
             }
         )
+
+"""
+En esta seccion del codigo empieza la creacion del primer dashoboard en el cual se tomaran los datos de puntajes
+de las peliculas para crear los datos que se requieran en el dashboard, para su manipulacion y analisis respectivo, separando por categorias 
+diferentes alineamientos de puntos, dependiendo de los datos que el usuario quiera saber o analizar
+"""
+def dashboart1():
+    if df_dashboard is None or df_dashboard.empty:
+        return html.P("No hay datos cargados. Por favor extrae y limpia los datos primero.")
+
+    df_dashboard["decada"] = (df_dashboard["year_movie"] // 10) * 10
+    decadas_disponibles = sorted(df_dashboard["decada"].unique())
+
+    # Agregar opción "Todo" con valor -1
+    opciones_dropdown = [{"label": "Todo", "value": -1}] + [{"label": f"{decada}s", "value": decada} for decada in decadas_disponibles]
+
+    return html.Div([
+        html.H3("Gráficas de Puntajes", style={"color": "#145A32", "marginBottom": "1rem"}),
+
+        html.Label("Selecciona una década:", style={"fontWeight": "bold"}),
+        dcc.Dropdown(
+            id="dropdown-decada",
+            options=opciones_dropdown,
+            value=-1,  # Valor por defecto: "Todo"
+            clearable=False,
+            style={"marginBottom": "2rem"}
+        ),
+
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="grafica-hist"), md=6),
+            dbc.Col(dcc.Graph(id="grafica-barras"), md=6),
+        ], className="mb-4"),
+
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="grafica-pie"), md=6),
+            dbc.Col(dcc.Graph(id="grafica-linea"), md=6),
+        ]),
+
+        html.H4("Top 10 películas mejor puntuadas", style={"marginTop": "2rem", "color": "#1A5276"}),
+        dcc.Graph(id="grafica-top10")
+    ],
+        style={
+            "backgroundColor": "rgba(255, 255, 255, 0.95)",
+            "padding": "1.5rem",
+            "borderRadius": "12px",
+            "boxShadow": "0 4px 12px rgba(0, 0, 0, 0.1)",
+            "maxWidth": "900px",
+            "margin": "auto",
+            "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+        })
+
+
+@app.callback(
+    Output("grafica-hist", "figure"),
+    Output("grafica-barras", "figure"),
+    Output("grafica-pie", "figure"),
+    Output("grafica-linea", "figure"),
+    Output("grafica-top10", "figure"),
+    Input("dropdown-decada", "value")
+)
+
