@@ -641,3 +641,22 @@ def actualizar_graficas_duracion(rango):
     )
 
     return fig_hist, fig_dispersion, fig_pie, fig_linea, fig_top10
+
+"""
+En esta seccion del codigo se manda a llamar a los dashboard que se crearon y que funcionen de manera correcta
+"""
+@app.callback(
+    Output("page-content", "children"),
+    Input("url", "pathname")
+)
+def render_page_content(pathname):
+    if pathname == "/":
+        return pagina_hogar()
+    elif pathname == "/dash1":
+        return dashboart1()
+    elif pathname == "/dash2":
+        return dashboart2()
+    return html.Div([
+        html.H1("404: Not found", className="text-danger"),
+        html.P(f"La página '{pathname}' no existe.")
+    ])
