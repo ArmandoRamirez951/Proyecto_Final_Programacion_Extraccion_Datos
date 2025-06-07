@@ -255,11 +255,7 @@ def migrar_a_mysql():
         except OperationalError as e:
             messagebox.showerror("Error", f"❌ No se pudo migrar a MySQL: {e}")
 
-"""
-Con esta  seccion empezamos a crear lo que sera la presentacion
-de nuestra pagina, sera la interfaz principal que el usuario podra ver,
-contendra titulo, nombre de materia, colaboradores e incluso el nonmbre y logo del maestro
-"""
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 df_dashboard = None
 
@@ -315,6 +311,11 @@ app.layout = html.Div([
     content
 ])
 
+"""
+Con esta  seccion empezamos a crear lo que sera la presentacion
+de nuestra pagina, sera la interfaz principal que el usuario podra ver,
+contendra titulo, nombre de materia, colaboradores e incluso el nonmbre y logo del maestro
+"""
 def pagina_hogar():
         return html.Div(
             [
