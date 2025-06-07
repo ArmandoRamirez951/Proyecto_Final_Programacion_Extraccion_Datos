@@ -722,6 +722,9 @@ def menu():
         else:
             messagebox.showerror("Error", "Ingrese un numero valido")
 
+"""
+Con el siguiente if se buscara mandar a llamar el menu
+"""
 if __name__ == "__main__":
     menu()
 
