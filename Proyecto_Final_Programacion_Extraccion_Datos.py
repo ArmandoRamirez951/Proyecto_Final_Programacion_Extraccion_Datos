@@ -514,3 +514,130 @@ def actualizar_graficas(decada):
     )
 
     return fig_hist, fig_barras, fig_pie, fig_linea, fig_top10
+
+
+"""
+En esta seccion utilizamos los datos limpios,
+utilizamos espesificamente los datos de tiempos que se limpiaron a minutos
+se crearon un total de 4 tablas y otra seccion a lo ultimo
+que muestra las 10 peliculas mas largas
+"""
+def dashboart2():
+    if df_dashboard is None or df_dashboard.empty:
+        return html.P("No hay datos cargados. Por favor extrae y limpia los datos primero.")
+
+    def rango_duracion(minutos):
+        if minutos < 60:
+            return "0-59 min"
+        elif minutos < 120:
+            return "60-119 min"
+        elif minutos < 180:
+            return "120-179 min"
+        elif minutos < 240:
+            return "180-239 min"
+        else:
+            return "240+ min"
+
+    df_dashboard["rango_duracion"] = df_dashboard["time_movie"].apply(rango_duracion)
+
+    def ordenar_rangos(rango):
+        if '+' in rango:
+            return int(rango.split('+')[0])
+        else:
+            return int(rango.split('-')[0])
+
+    rangos_disponibles = sorted(df_dashboard["rango_duracion"].unique(), key=ordenar_rangos)
+
+    opciones_dropdown = [{"label": "Todo", "value": "Todo"}] + [{"label": r, "value": r} for r in rangos_disponibles]
+
+    return html.Div([
+        html.H3("Gráficas de Duración", style={"color": "#145A32", "marginBottom": "1rem"}),
+
+        html.Label("Selecciona un rango de duración:", style={"fontWeight": "bold"}),
+        dcc.Dropdown(
+            id="dropdown-duracion",
+            options=opciones_dropdown,
+            value="Todo",
+            clearable=False,
+            style={"marginBottom": "2rem"}
+        ),
+
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="grafica-hist-duracion"), md=6),
+            dbc.Col(dcc.Graph(id="grafica-dispersion-duracion"), md=6),  # Nombre cambiado correctamente
+        ], className="mb-4"),
+
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="grafica-pie-duracion"), md=6),
+            dbc.Col(dcc.Graph(id="grafica-linea-duracion"), md=6),
+        ]),
+
+        html.H4("Top 10 películas más largas", style={"marginTop": "2rem", "color": "#1A5276"}),
+        dcc.Graph(id="grafica-top10-duracion")
+    ],
+    style={
+        "backgroundColor": "rgba(255, 255, 255, 0.95)",
+        "padding": "1.5rem",
+        "borderRadius": "12px",
+        "boxShadow": "0 4px 12px rgba(0, 0, 0, 0.1)",
+        "maxWidth": "900px",
+        "margin": "auto",
+        "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    })
+
+@app.callback(
+    Output("grafica-hist-duracion", "figure"),
+    Output("grafica-dispersion-duracion", "figure"),  # <- nuevo ID aquí también
+    Output("grafica-pie-duracion", "figure"),
+    Output("grafica-linea-duracion", "figure"),
+    Output("grafica-top10-duracion", "figure"),
+    Input("dropdown-duracion", "value")
+)
+def actualizar_graficas_duracion(rango):
+    if rango == "Todo":
+        df_filtrado = df_dashboard.copy()
+    else:
+        df_filtrado = df_dashboard[df_dashboard["rango_duracion"] == rango]
+
+    # Histograma
+    fig_hist = px.histogram(df_filtrado, x="time_movie", nbins=20, title="Histograma de Duración (minutos)")
+
+    # Dispersión
+    fig_dispersion = px.scatter(
+        df_filtrado,
+        x="time_movie",
+        y="score_movie",
+        title="Duración vs Puntaje",
+        labels={"time_movie": "Duración (minutos)", "score_movie": "Puntaje"},
+        hover_data=["name_movie", "year_movie"],
+        color="score_movie",
+        color_continuous_scale=px.colors.sequential.Viridis,
+    )
+
+    # Pie
+    conteo_rango = df_filtrado["rango_duracion"].value_counts().sort_index()
+    fig_pie = px.pie(
+        names=conteo_rango.index, values=conteo_rango.values,
+        title="Distribución de Películas por Rango de Duración"
+    )
+
+    # Línea
+    promedio_por_año = df_filtrado.groupby("year_movie")["time_movie"].mean().reset_index()
+    fig_linea = px.line(
+        promedio_por_año, x="year_movie", y="time_movie",
+        title="Promedio de Duración por Año",
+        labels={"year_movie": "Año", "time_movie": "Duración Promedio (minutos)"},
+        markers=True
+    )
+
+    # Top 10
+    top10 = df_filtrado.sort_values("time_movie", ascending=False).head(10)
+    fig_top10 = px.bar(
+        top10,
+        x="name_movie",
+        y="time_movie",
+        title="Top 10 películas más largas",
+        labels={"name_movie": "Película", "time_movie": "Duración (minutos)"}
+    )
+
+    return fig_hist, fig_dispersion, fig_pie, fig_linea, fig_top10
