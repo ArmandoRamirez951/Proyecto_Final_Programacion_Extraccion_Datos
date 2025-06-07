@@ -35,7 +35,6 @@ root = Tk()
 root.withdraw()
 import re
 
-
 # ----------- Aquí van tus funciones originales sin modificar -----------
 """
 En la siguiente seccion del codigo la actividad a realizar es la extraccion de datos, 
@@ -298,7 +297,7 @@ sidebar = html.Div(
                 dbc.NavLink("Distribución por Puntajes", href="/dash1", active="exact", style={"color": "white"}),
                 dbc.NavLink("Distribución por Duración", href="/dash2", active="exact", style={"color": "white"}),
                 dbc.NavLink("Datos Origen", href="https://www.imdb.com/es-es/", target="_blank", style={"color": "white"}),
-                dbc.NavLink("Trabajo en Github", href="https://github.com/ArmandoRamirez951/Programacion_extraccion_datos", target="_blank", style={"color": "white"})
+                dbc.NavLink("Trabajo en Github", href="https://github.com/ArmandoRamirez951/Proyecto_Final_Programacion_Extraccion_Datos", target="_blank", style={"color": "white"})
             ],
             vertical=True,
             pills=True,
