@@ -471,3 +471,46 @@ def dashboart1():
     Input("dropdown-decada", "value")
 )
 
+def actualizar_graficas(decada):
+    if decada == -1:
+        df_filtrado = df_dashboard.copy()  # Todos los datos
+    else:
+        df_filtrado = df_dashboard[df_dashboard["decada"] == decada]
+
+    # Histograma
+    fig_hist = px.histogram(df_filtrado, x="score_movie", nbins=20, title="Histograma de Puntajes")
+
+    # Barras
+    conteo = df_filtrado["score_movie"].value_counts().sort_index()
+    fig_barras = px.bar(
+        x=conteo.index, y=conteo.values,
+        labels={"x": "Puntaje", "y": "Cantidad"},
+        title="Conteo de Puntajes"
+    )
+
+    # Pie
+    fig_pie = px.pie(
+        names=conteo.index, values=conteo.values,
+        title="Distribución de Puntajes"
+    )
+
+    # Línea
+    promedio_por_año = df_filtrado.groupby("year_movie")["score_movie"].mean().reset_index()
+    fig_linea = px.line(
+        promedio_por_año, x="year_movie", y="score_movie",
+        title="Promedio de Puntajes por Año",
+        labels={"year_movie": "Año", "score_movie": "Puntaje Promedio"},
+        markers=True
+    )
+
+    # Top 10
+    top10 = df_filtrado.sort_values("score_movie", ascending=False).head(10)
+    fig_top10 = px.bar(
+        top10,
+        x="name_movie",
+        y="score_movie",
+        title="Top 10 películas mejor puntuadas",
+        labels={"name_movie": "Película", "score_movie": "Puntaje"}
+    )
+
+    return fig_hist, fig_barras, fig_pie, fig_linea, fig_top10
