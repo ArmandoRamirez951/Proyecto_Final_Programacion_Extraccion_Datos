@@ -661,6 +661,8 @@ def render_page_content(pathname):
         html.P(f"La página '{pathname}' no existe.")
     ])
 
+
+
 """
 En esta seccion se inicia el dashboart, para que
 funcione correctamente ya que manda a llamar los archivos
@@ -689,5 +691,38 @@ def iniciar_dashboard():
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
     app.run(debug=False)
+
+# ----------- Menú -----------
+"""
+En esta seccion del codigo se presenta el menu interactivo del codigo, para su manipulacion
+a gusto del encargado de revisar el proyecto
+"""
+def menu():
+    opc = 0
+    while (opc != 5):
+        opc = simpledialog.askinteger(" Proyecto Final - Programacio para Extraccion de Datos ",
+                                      "                             MENU                        \n"
+                                      "1) Extraer datos de la pagina de IMDB "
+                                      "\n2) Realizar limpieza de los datos extraidos "
+                                      "\n3) Migrar los datos a MYSQL "
+                                      "\n4) Abrir los dashboard "
+                                      "\n5) Salir del programa")
+        if opc == 1:
+            extraccion()
+        elif opc == 2:
+            limpieza_de_los_datos()
+        elif opc == 3:
+            migrar_a_mysql()
+        elif opc == 4:
+            iniciar_dashboard()
+            root.withdraw()
+        elif opc == 5:
+            messagebox.showinfo("SAlIENDO", "Gracias Vuelva Pronto")
+            root.destroy()
+        else:
+            messagebox.showerror("Error", "Ingrese un numero valido")
+
+if __name__ == "__main__":
+    menu()
 
 
