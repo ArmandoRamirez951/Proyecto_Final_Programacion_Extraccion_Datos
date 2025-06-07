@@ -660,3 +660,33 @@ def render_page_content(pathname):
         html.H1("404: Not found", className="text-danger"),
         html.P(f"La página '{pathname}' no existe.")
     ])
+
+"""
+En esta seccion se crea un menu para que cuando lo manden 
+a llamar, este muestre todo el trabajo que estamos realizando
+"""
+def iniciar_dashboard():
+    messagebox.showwarning("Regresar al Menu", "Cuando requiera volver al menú presione el botón stop del programa")
+    global df_dashboard
+    ruta_csv_limpio = "Extraccion de datos/movies_limpio.csv"
+
+    if os.path.isfile(ruta_csv_limpio):
+        df_dashboard = pd.read_csv(ruta_csv_limpio)
+    else:
+        print("Archivo limpio no encontrado. Por favor limpia los datos primero.")
+        return
+
+    print("\n>>> Primeras filas del DataFrame limpio:")
+    print(df_dashboard.head())
+
+    print("\n>>> Tipos de datos:")
+    print(df_dashboard.dtypes)
+
+    print("\n>>> Valores nulos en cada columna:")
+    print(df_dashboard.isnull().sum())
+
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+    app.run(debug=False)
+
+
