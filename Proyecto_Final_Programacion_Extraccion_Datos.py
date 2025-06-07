@@ -727,5 +727,31 @@ Con el siguiente if se buscara mandar a llamar el menu
 """
 if __name__ == "__main__":
     menu()
+"""
+Visualmente se vera parecido de la siguiente forma
+"""
 
+"""
+    while True:
+        print("\n=== Menú IMDb ===")
+        print("1. Extraer datos de IMDb")
+        print("2. Limpiar datos")
+        print("3. Migrar datos a MySQL")
+        print("4. Abrir dashboard")
+        print("5. Salir")
+        opcion = input("Seleccione una opción: ")
+        if opcion == "1":
+            extraccion()
+        elif opcion == "2":
+            limpieza_de_los_datos()
+        elif opcion == "3":
+            migrar_a_mysql()
+        elif opcion == "4":
+            iniciar_dashboard()
+        elif opcion == "5":
+            print("Saliendo...")
+            sys.exit()
+        else:
+            print("Opción no válida. Intente nuevamente.")
+"""
 
