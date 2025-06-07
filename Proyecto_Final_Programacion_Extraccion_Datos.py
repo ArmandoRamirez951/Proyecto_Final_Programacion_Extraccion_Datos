@@ -4,7 +4,7 @@ integrantes:
     -- De La Cruz Ramirez Jeremy Yael
     -- Ramirez Cardenas Luis Armando
 Grupo: 951
-Fecha:
+Fecha: 08/06/2025
 Profesor: Josue Miguel Flores Parra
 '''
 
