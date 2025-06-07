@@ -241,61 +241,6 @@ def limpieza_de_los_datos():
     print(df.head())
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-df_dashboard = None
-
-SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": 0,
-    "left": 0,
-    "bottom": 0,
-    "width": "16rem",
-    "padding": "2rem 1rem",
-    "background": "linear-gradient(to bottom, #A9DFBF, #58D68D)",
-    "color": "white",
-    "boxShadow": "2px 0 5px rgba(0,0,0,0.1)",
-    "textShadow": "1px 1px 2px rgba(0,0,0,0.3)"
-}
-
-CONTENT_STYLE = {
-    "margin-left": "18rem",
-    "margin-right": "2rem",
-    "padding": "2rem 2rem",
-    "backgroundColor": "white",
-    "borderRadius": "12px",
-    "boxShadow": "0 8px 24px rgba(0,0,0,0.1)",
-    "minHeight": "100vh"
-}
-
-sidebar = html.Div(
-    [
-        html.H2("IMDb Movies", className="display-4", style={"color": "white", "textShadow": "2px 2px 4px rgba(0,0,0,0.5)"}),
-        html.Hr(style={"borderColor": "rgba(255,255,255,0.3)"}),
-        html.P("Proyecto final - Dashboard", className="lead", style={"color": "white", "textShadow": "1px 1px 2px rgba(0,0,0,0.3)"}),
-        dbc.Nav(
-            [
-                dbc.NavLink("Hogar", href="/", active="exact", style={"color": "white"}),
-                dbc.NavLink("Distribución por Puntajes", href="/dash1", active="exact", style={"color": "white"}),
-                dbc.NavLink("Distribución por Duración", href="/dash2", active="exact", style={"color": "white"}),
-                dbc.NavLink("Datos Origen", href="https://www.imdb.com/es-es/", target="_blank", style={"color": "white"}),
-                dbc.NavLink("Trabajo en Github", href="https://github.com/ArmandoRamirez951/Programacion_extraccion_datos", target="_blank", style={"color": "white"})
-            ],
-            vertical=True,
-            pills=True,
-        ),
-    ],
-    style=SIDEBAR_STYLE,
-)
-
-content = html.Div(id="page-content", style=CONTENT_STYLE)
-
-# Aquí va el layout general, antes de iniciar el servidor
-app.layout = html.Div([
-    dcc.Location(id="url"),  # Necesario para navegación entre páginas
-    sidebar,
-    content
-])
-
 """
 En esta seccion del codigo se tomara el dataframe movies ya con su respectiva limpieza y normalizada y
 se migrara como parte del proyecto al programa de MYSQL Workbench, (no si antes hacer conexion) donde el usuario ingresara
@@ -373,3 +318,58 @@ def migrar_a_mysql():
             print("✅ Migración completada correctamente.")
         except OperationalError as e:
             messagebox.showerror("Error", f"❌ No se pudo migrar a MySQL: {e}")
+
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+df_dashboard = None
+
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+    "background": "linear-gradient(to bottom, #A9DFBF, #58D68D)",
+    "color": "white",
+    "boxShadow": "2px 0 5px rgba(0,0,0,0.1)",
+    "textShadow": "1px 1px 2px rgba(0,0,0,0.3)"
+}
+
+CONTENT_STYLE = {
+    "margin-left": "18rem",
+    "margin-right": "2rem",
+    "padding": "2rem 2rem",
+    "backgroundColor": "white",
+    "borderRadius": "12px",
+    "boxShadow": "0 8px 24px rgba(0,0,0,0.1)",
+    "minHeight": "100vh"
+}
+
+sidebar = html.Div(
+    [
+        html.H2("IMDb Movies", className="display-4", style={"color": "white", "textShadow": "2px 2px 4px rgba(0,0,0,0.5)"}),
+        html.Hr(style={"borderColor": "rgba(255,255,255,0.3)"}),
+        html.P("Proyecto final - Dashboard", className="lead", style={"color": "white", "textShadow": "1px 1px 2px rgba(0,0,0,0.3)"}),
+        dbc.Nav(
+            [
+                dbc.NavLink("Hogar", href="/", active="exact", style={"color": "white"}),
+                dbc.NavLink("Distribución por Puntajes", href="/dash1", active="exact", style={"color": "white"}),
+                dbc.NavLink("Distribución por Duración", href="/dash2", active="exact", style={"color": "white"}),
+                dbc.NavLink("Datos Origen", href="https://www.imdb.com/es-es/", target="_blank", style={"color": "white"}),
+                dbc.NavLink("Trabajo en Github", href="https://github.com/ArmandoRamirez951/Proyecto_Final_Programacion_Extraccion_Datos", target="_blank", style={"color": "white"})
+            ],
+            vertical=True,
+            pills=True,
+        ),
+    ],
+    style=SIDEBAR_STYLE,
+)
+
+content = html.Div(id="page-content", style=CONTENT_STYLE)
+
+# Aquí va el layout general, antes de iniciar el servidor
+app.layout = html.Div([
+    dcc.Location(id="url"),  # Necesario para navegación entre páginas
+    sidebar,
+    content
+])
